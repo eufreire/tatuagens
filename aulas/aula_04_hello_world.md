@@ -17,7 +17,7 @@ Se a máquina foi reiniciada desde a última aula, repita os passos da Aula 3 an
    ```
 
 ---
-
+ 
 ## O que vamos fazer nessa aula
 
 1. Entender o que é o FastAPI e o uvicorn
@@ -101,7 +101,7 @@ uvicorn main:app --reload
 Se tudo estiver certo, vai aparecer isso no terminal:
 
 ```
-INFO:     Uvicorn running on http://127.0.0.1:8000 (Press CTRL+C to quit)
+INFO:     Uvicorn running on http://127.0.0.1':8000 (Press CTRL+C to quit)
 INFO:     Started reloader process
 ```
 
