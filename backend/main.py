@@ -1,6 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from rotas import clientes
+# Adicione "agendamentos" na linha de importação abaixo:
+from rotas import clientes, senioridade, tatuadores, agendamentos
 
 app = FastAPI()
 
@@ -12,6 +13,9 @@ app.add_middleware(
 )
 
 app.include_router(clientes.router)
+app.include_router(senioridade.router)
+app.include_router(tatuadores.router)
+app.include_router(agendamentos.router)
 
 @app.get("/")
 def inicio():

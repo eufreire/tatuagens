@@ -75,7 +75,8 @@ def deletar_cliente(id: int):
     except Exception:
         conn.rollback()
         conn.close()
-        return {"erro": "Não foi possível excluir este cliente. Verifique se ele possui agendamentos."}from typing import Optional
+        return {"erro": "Não foi possível excluir este cliente. Verifique se ele possui agendamentos."}
+from typing import Optional
 from fastapi import APIRouter
 from pydantic import BaseModel
 from database import conectar
