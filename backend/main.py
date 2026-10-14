@@ -1,8 +1,8 @@
 from fastapi import FastAPI
-from fastapi.staticfiles import StaticFiles   # ← novo: serve as imagens
+from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
-from rotas import clientes, senioridade, tatuadores, agendamentos
-import os   # ← novo: para criar a pasta
+from rotas import clientes, senioridade, tatuadores, agendamentos, estilos
+import os
 
 app = FastAPI()
 
@@ -13,14 +13,41 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# ← novo: Cria a pasta 'uploads' se ela não existir e serve os arquivos dela
-os.makedirs("uploads", exist_ok=True) 
-app.mount("/uploads", StaticFiles(directory="uploads"), name="uploads") 
+os.makedirs("uploads", exist_ok=True)
+app.mount("/uploads", StaticFiles(directory="uploads"), name="uploads")
 
-app.include_router(clientes.router)
-app.include_router(senioridade.router)
-app.include_router(tatuadores.router)
-app.include_router(agendamentos.router)
+app.include_router(clientes.router, prefix="/clientes", tags=["Clientes"])
+app.include_router(senioridade.router, prefix="/senioridade", tags=["Senioridade"])
+app.include_router(estilos.router, prefix="/estilos", tags=["Estilos"])
+app.include_router(tatuadores.router, prefix="/tatuadores", tags=["Tatuadores"])
+app.include_router(agendamentos.router, prefix="/agendamentos", tags=["Agendamentos"])
+
+@app.get("/")
+def inicio():
+    return {"mensagem": "API do estúdio de tatuagem funcionando!"}
+from fastapi import FastAPI
+from fastapi.staticfiles import StaticFiles
+from fastapi.middleware.cors import CORSMiddleware
+from rotas import clientes, senioridade, tatuadores, agendamentos, estilos
+import os
+
+app = FastAPI()
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+os.makedirs("uploads", exist_ok=True)
+app.mount("/uploads", StaticFiles(directory="uploads"), name="uploads")
+
+app.include_router(clientes.router, prefix="/clientes", tags=["Clientes"])
+app.include_router(senioridade.router, prefix="/senioridade", tags=["Senioridade"])
+app.include_router(estilos.router, prefix="/estilos", tags=["Estilos"])
+app.include_router(tatuadores.router, prefix="/tatuadores", tags=["Tatuadores"])
+app.include_router(agendamentos.router, prefix="/agendamentos", tags=["Agendamentos"])
 
 @app.get("/")
 def inicio():

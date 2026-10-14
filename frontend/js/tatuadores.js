@@ -1,32 +1,59 @@
 const API = 'http://127.0.0.1:8000'
+
 const formTatuador = document.getElementById('form-tatuador')
 const botaoSubmit = document.getElementById('btn-submit-tatuador')
 
 function limparFormulario() {
   formTatuador.reset()
   delete formTatuador.dataset.idTatuador
+  document.querySelectorAll('#lista-estilos input').forEach(cb => cb.checked = false)
   botaoSubmit.textContent = 'Cadastrar'
-  botaoSubmit.className = 'btn btn-primary w-100'
+  botaoSubmit.classList.remove('btn-success')
+  botaoSubmit.classList.add('btn-primary')
 }
 
 async function carregarSenioridades() {
   const resposta = await fetch(`${API}/senioridade`)
   const senioridades = await resposta.json()
   const select = document.getElementById('idsenioridade')
-  senioridades.forEach(s => {
-    select.innerHTML += `<option value="${s.idsenioridade}">${s.nome}</option>`
+  select.innerHTML = '<option value="">Senioridade...</option>'
+  senioridades.forEach(s => select.innerHTML += `<option value="${s.idsenioridade}">${s.nome}</option>`)
+}
+
+async function carregarEstilos() {
+  const resposta = await fetch(`${API}/estilos`)
+  const estilos = await resposta.json()
+  const lista = document.getElementById('lista-estilos')
+  lista.innerHTML = ''
+  estilos.forEach(e => {
+    lista.innerHTML += `
+      <div class="form-check">
+        <input class="form-check-input" type="checkbox" value="${e.idestilo}" id="estilo-${e.idestilo}">
+        <label class="form-check-label" for="estilo-${e.idestilo}">${e.descricao}</label>
+      </div>`
   })
 }
+
+carregarSenioridades()
+carregarEstilos()
 
 async function listarTatuadores() {
   const resposta = await fetch(`${API}/tatuadores`)
   const tatuadores = await resposta.json()
+
   const corpo = document.getElementById('corpo-tabela')
   corpo.innerHTML = ''
+
   tatuadores.forEach(t => {
     corpo.innerHTML += `
       <tr>
-        <td>${t.idtatuador}</td><td>${t.nometatuador}</td><td>${t.cpf}</td><td>${t.senioridade}</td>
+        <td>${t.idtatuador}</td>
+        <td>${t.nometatuador}</td>
+        <td>${t.cpf}</td>
+        <td>${t.email ?? '-'}</td>
+        <td>${t.telefone ?? '-'}</td>
+        <td>${t.senioridade}</td>
+        <td>${t.estilos ?? '-'}</td>
         <td>
           <button class="btn btn-sm btn-warning me-2" onclick='preencherFormularioEdicao(${JSON.stringify(t)})'>Editar</button>
           <button class="btn btn-sm btn-danger" onclick="deletarTatuador(${t.idtatuador})">Excluir</button>
@@ -35,11 +62,11 @@ async function listarTatuadores() {
   })
 }
 
-carregarSenioridades()
 listarTatuadores()
 
 formTatuador.addEventListener('submit', async (e) => {
   e.preventDefault()
+
   const tatuador = {
     nometatuador: document.getElementById('nometatuador').value,
     cpf: document.getElementById('cpf').value,
@@ -48,30 +75,71 @@ formTatuador.addEventListener('submit', async (e) => {
     datacontratacao: new Date().toISOString().split('T')[0],
     idsenioridade: Number(document.getElementById('idsenioridade').value)
   }
-  const id = formTatuador.dataset.idTatuador
 
-  if (id) {
-    await fetch(`${API}/tatuadores/${id}`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(tatuador) })
+  const idTatuador = formTatuador.dataset.idTatuador
+  let idParaEstilos = idTatuador
+
+  if (idTatuador) {
+    await fetch(`${API}/tatuadores/${idTatuador}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(tatuador)
+    })
   } else {
-    await fetch(`${API}/tatuadores`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(tatuador) })
+    const resposta = await fetch(`${API}/tatuadores`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(tatuador)
+    })
+    const dados = await resposta.json()
+    idParaEstilos = dados.idtatuador
   }
+
+  const idsMarcados = Array.from(document.querySelectorAll('#lista-estilos input:checked'))
+    .map(checkbox => Number(checkbox.value))
+
+  await fetch(`${API}/tatuadores/${idParaEstilos}/estilos`, {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ idestilos: idsMarcados })
+  })
+
   limparFormulario()
   listarTatuadores()
 })
 
-function preencherFormularioEdicao(t) {
-  document.getElementById('nometatuador').value = t.nometatuador
-  document.getElementById('cpf').value = t.cpf
-  document.getElementById('email').value = t.email || ''
-  document.getElementById('telefone').value = t.telefone || ''
-  document.getElementById('idsenioridade').value = t.idsenioridade
-  formTatuador.dataset.idTatuador = t.idtatuador
-  botaoSubmit.textContent = 'Salvar'
-  botaoSubmit.className = 'btn btn-success w-100'
+async function preencherFormularioEdicao(tatuador) {
+  document.getElementById('nometatuador').value = tatuador.nometatuador
+  document.getElementById('cpf').value = tatuador.cpf
+  document.getElementById('email').value = tatuador.email || ''
+  document.getElementById('telefone').value = tatuador.telefone || ''
+  document.getElementById('idsenioridade').value = tatuador.idsenioridade
+
+  formTatuador.dataset.idTatuador = tatuador.idtatuador
+
+  document.querySelectorAll('#lista-estilos input').forEach(cb => cb.checked = false)
+
+  const resposta = await fetch(`${API}/tatuadores/${tatuador.idtatuador}/estilos`)
+  const estilosDoTatuador = await resposta.json()
+  estilosDoTatuador.forEach(e => {
+    const checkbox = document.getElementById(`estilo-${e.idestilo}`)
+    if (checkbox) checkbox.checked = true
+  })
+
+  botaoSubmit.textContent = 'Salvar alteração'
+  botaoSubmit.classList.remove('btn-primary')
+  botaoSubmit.classList.add('btn-success')
 }
 
 async function deletarTatuador(id) {
-  if (!confirm('Excluir?')) return
-  await fetch(`${API}/tatuadores/${id}`, { method: 'DELETE' })
+  if (!confirm('Tem certeza que deseja excluir este tatuador?')) return
+
+  const resposta = await fetch(`${API}/tatuadores/${id}`, { method: 'DELETE' })
+  const dados = await resposta.json()
+
+  if (dados.erro) {
+    alert(dados.erro)
+  }
+
   listarTatuadores()
 }
