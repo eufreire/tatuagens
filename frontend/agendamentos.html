@@ -45,7 +45,11 @@
       <textarea id="descricaotatuagem" class="form-control" placeholder="Descrição da tatuagem"></textarea>
     </div>
 
-    <!-- Bloco escondido que só aparece ao editar -->
+    <div class="col-md-4">
+      <label class="form-label">Desenho aprovado (imagem)</label>
+      <input type="file" id="desenho" class="form-control" accept="image/*">
+    </div>
+
     <div class="col-md-3" id="bloco-status" style="display: none;">
       <select id="status" class="form-select">
         <option value="pendente">Pendente</option>
@@ -57,19 +61,28 @@
 
     <div class="col-md-2">
       <button id="btn-submit-agendamento" type="submit" class="btn btn-primary w-100">Cadastrar</button>
-      <label class="form-label">Desenho aprovado (imagem)</label>
-  <input type="file" id="desenho" class="form-control" accept="image/*">
     </div>
   </form>
 
   <table class="table table-bordered">
     <thead>
-      <th>Desenho</th>
-      <tr><th>ID</th><th>Cliente</th><th>Tatuador</th><th>Data</th><th>Hora</th><th>Valor</th><th>Status</th><th>Ações</th></tr>
+      <tr>
+        <th>ID</th>
+        <th>Cliente</th>
+        <th>Tatuador</th>
+        <th>Data</th>
+        <th>Hora</th>
+        <th>Valor</th>
+        <th>Status</th>
+        <th>Desenho</th>
+        <th>Ações</th>
+      </tr>
     </thead>
-    <tbody id="corpo-tabela"></tbody>
+    <tbody id="corpo-tabela">
+    </tbody>
   </table>
 
   <script src="js/agendamentos.js"></script>
+
 </body>
 </html>
