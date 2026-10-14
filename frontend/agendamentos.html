@@ -57,11 +57,14 @@
 
     <div class="col-md-2">
       <button id="btn-submit-agendamento" type="submit" class="btn btn-primary w-100">Cadastrar</button>
+      <label class="form-label">Desenho aprovado (imagem)</label>
+  <input type="file" id="desenho" class="form-control" accept="image/*">
     </div>
   </form>
 
   <table class="table table-bordered">
     <thead>
+      <th>Desenho</th>
       <tr><th>ID</th><th>Cliente</th><th>Tatuador</th><th>Data</th><th>Hora</th><th>Valor</th><th>Status</th><th>Ações</th></tr>
     </thead>
     <tbody id="corpo-tabela"></tbody>
