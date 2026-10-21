@@ -1,26 +1,18 @@
-const API = 'http://127.0.0.1:8000'
-const formLogin = document.getElementById('form-login')
+const formLogin = document.getElementById('form-login');
 
-formLogin.addEventListener('submit', async (e) => {
-  e.preventDefault()
+formLogin.addEventListener('submit', (e) => {
+  e.preventDefault();
+  const email = document.getElementById('email').value;
+  const senha = document.getElementById('senha').value;
 
-  const dados = {
-    email: document.getElementById('email').value,
-    senha: document.getElementById('senha').value
-  }
+  const usuarios = JSON.parse(localStorage.getItem('usuarios')) || [];
+  const usuarioEncontrado = usuarios.find(u => u.email === email && u.senha === senha);
 
-  const resposta = await fetch(`${API}/login`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(dados)
-  })
-
-  const resultado = await resposta.json()
-
-  if (resposta.ok) {
-    localStorage.setItem('token', resultado.access_token)
-    window.location.href = 'dashboard.html'
+  if ((email === 'admin@estudio.com' && senha === '123456') || usuarioEncontrado) {
+    localStorage.setItem('usuarioLogado', email);
+    alert('Login realizado com sucesso!');
+    window.location.href = 'dashboard.html';
   } else {
-    alert('Erro ao entrar: ' + resultado.erro)
+    alert('E-mail ou senha incorretos!');
   }
-})
+});

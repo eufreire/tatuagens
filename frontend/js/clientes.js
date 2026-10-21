@@ -85,3 +85,5 @@ async function deletarCliente(id) {
   await fetch(`${API}/clientes/${id}`, { method: 'DELETE' })
   listarClientes()
 }
+
+carregarClientes()

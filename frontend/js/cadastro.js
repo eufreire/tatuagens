@@ -1,32 +1,21 @@
-const API = 'http://127.0.0.1:8000'
-const formCadastro = document.getElementById('form-cadastro')
+const formCadastro = document.getElementById('form-cadastro');
 
-formCadastro.addEventListener('submit', async (e) => {
-  e.preventDefault()
+formCadastro.addEventListener('submit', (e) => {
+  e.preventDefault();
+  const nome = document.getElementById('nome').value;
+  const email = document.getElementById('email').value;
+  const senha = document.getElementById('senha').value;
 
-  const usuario = {
-    nome: document.getElementById('nome').value,
-    email: document.getElementById('email').value,
-    senha: document.getElementById('senha').value
+  const usuarios = JSON.parse(localStorage.getItem('usuarios')) || [];
+
+  if (usuarios.some(u => u.email === email)) {
+    alert('Este e-mail já está cadastrado!');
+    return;
   }
 
-  try {
-    const resposta = await fetch(`${API}/usuarios`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(usuario)
-    })
+  usuarios.push({ nome, email, senha });
+  localStorage.setItem('usuarios', JSON.stringify(usuarios));
 
-    const resultado = await resposta.json()
-
-    if (resposta.ok) {
-      alert('Cadastro feito com sucesso!')
-      window.location.href = 'index.html'
-    } else {
-      alert('Erro ao cadastrar: ' + (resultado.erro || JSON.stringify(resultado)))
-    }
-  } catch (erro) {
-    console.error('Erro de conexão:', erro)
-    alert('Não foi possível conectar à API.')
-  }
-})
+  alert('Cadastro realizado com sucesso! Faça login.');
+  window.location.href = 'login.html';
+});

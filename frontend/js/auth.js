@@ -1,29 +1,12 @@
-function protegerPagina() {
-  const token = localStorage.getItem('token')
-  if (!token) {
-    window.location.href = 'login.html'
-  }
+const usuarioLogado = localStorage.getItem('usuarioLogado');
+const paginaAtual = window.location.pathname;
+
+// Se não estiver logado e tentar acessar páginas protegidas, redireciona para o login
+if (!usuarioLogado && !paginaAtual.includes('login.html') && !paginaAtual.includes('cadastro.html') && !paginaAtual.includes('index.html')) {
+  window.location.href = 'login.html';
 }
 
-async function fetchAutenticado(url, opcoes = {}) {
-  const token = localStorage.getItem('token')
-
-  opcoes.headers = {
-    ...opcoes.headers,
-    'Authorization': `Bearer ${token}`
-  }
-
-  const resposta = await fetch(url, opcoes)
-
-  if (resposta.status === 401) {
-    localStorage.removeItem('token')
-    window.location.href = 'login.html'
-  }
-
-  return resposta
-}
-
-function sair() {
-  localStorage.removeItem('token')
-  window.location.href = 'login.html'
+function fazerLogout() {
+  localStorage.removeItem('usuarioLogado');
+  window.location.href = 'login.html';
 }

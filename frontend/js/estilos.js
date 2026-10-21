@@ -68,3 +68,5 @@ async function deletarEstilo(id) {
   await fetch(`${API}/estilos/${id}`, { method: 'DELETE' })
   listarEstilos()
 }
+
+carregarEstilos()

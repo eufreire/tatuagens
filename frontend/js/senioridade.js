@@ -68,3 +68,5 @@ async function deletarSenioridade(id) {
   await fetch(`${API}/senioridade/${id}`, { method: 'DELETE' })
   listarSenioridades()
 }
+
+carregarSenioridade()

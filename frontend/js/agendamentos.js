@@ -135,3 +135,5 @@ async function deletarAgendamento(id) {
   await fetch(`${API}/agendamentos/${id}`, { method: 'DELETE' })
   listarAgendamentos()
 }
+
+carregarAgendamentos()
