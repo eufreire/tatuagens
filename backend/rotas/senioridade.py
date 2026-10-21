@@ -7,7 +7,7 @@ router = APIRouter()
 class Senioridade(BaseModel):
     nome: str
 
-@router.get("")
+@router.get("/senioridade")
 def listar_senioridade():
     conn = conectar()
     cursor = conn.cursor(dictionary=True)
@@ -16,7 +16,7 @@ def listar_senioridade():
     conn.close()
     return senioridades
 
-@router.get("/{id}")
+@router.get("/senioridade/{id}")
 def buscar_senioridade(id: int):
     conn = conectar()
     cursor = conn.cursor(dictionary=True)
@@ -27,7 +27,7 @@ def buscar_senioridade(id: int):
         return {"erro": "Senioridade não encontrada"}
     return senioridade
 
-@router.post("")
+@router.post("/senioridade")
 def criar_senioridade(senioridade: Senioridade):
     conn = conectar()
     cursor = conn.cursor()
@@ -36,7 +36,7 @@ def criar_senioridade(senioridade: Senioridade):
     conn.close()
     return {"mensagem": "Senioridade cadastrada com sucesso"}
 
-@router.put("/{id}")
+@router.put("/senioridade/{id}")
 def atualizar_senioridade(id: int, senioridade: Senioridade):
     conn = conectar()
     cursor = conn.cursor()
@@ -45,7 +45,7 @@ def atualizar_senioridade(id: int, senioridade: Senioridade):
     conn.close()
     return {"mensagem": "Senioridade atualizada com sucesso"}
 
-@router.delete("/{id}")
+@router.delete("/senioridade/{id}")
 def deletar_senioridade(id: int):
     conn = conectar()
     cursor = conn.cursor()
@@ -57,4 +57,4 @@ def deletar_senioridade(id: int):
     except Exception as erro:
         conn.rollback()
         conn.close()
-        return {"erro": "Não foi possível excluir esta senioridade. Verifique se há tatuadores vinculados a ela."}
+        return {"erro": "Não foi possível excluir esta senioridade. Verifique se ela está sendo usada por algum tatuador."}

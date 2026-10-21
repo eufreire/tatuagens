@@ -1,48 +1,70 @@
 const API = 'http://127.0.0.1:8000'
-protegerPagina()
+const formSenioridade = document.getElementById('form-senioridade')
+const botaoSubmit = document.getElementById('btn-submit-senioridade')
 
-async function carregarSenioridade() {
-  const resposta = await fetchAutenticado(`${API}/senioridade`)
-  const lista = await resposta.json()
-  
-  const tabela = document.getElementById('tabela-senioridade')
-  tabela.innerHTML = ''
+function limparFormulario() {
+  formSenioridade.reset()
+  delete formSenioridade.dataset.idSenioridade
+  botaoSubmit.textContent = 'Cadastrar'
+  botaoSubmit.classList.remove('btn-success')
+  botaoSubmit.classList.add('btn-primary')
+}
 
-  lista.forEach(s => {
-    tabela.innerHTML += `
+async function listarSenioridades() {
+  const resposta = await fetch(`${API}/senioridade`)
+  const senioridades = await resposta.json()
+  const corpo = document.getElementById('corpo-tabela')
+  corpo.innerHTML = ''
+
+  senioridades.forEach(s => {
+    corpo.innerHTML += `
       <tr>
-        <td>${s.id}</td>
-        <td>${s.nivel}</td>
+        <td>${s.idsenioridade}</td>
+        <td>${s.nome}</td>
         <td>
-          <button class="btn btn-sm btn-danger" onclick="deletarSenioridade(${s.id})">Excluir</button>
+          <button class="btn btn-sm btn-warning me-2" onclick='preencherFormularioEdicao(${JSON.stringify(s)})'>Editar</button>
+          <button class="btn btn-sm btn-danger" onclick="deletarSenioridade(${s.idsenioridade})">Excluir</button>
         </td>
-      </tr>
-    `
+      </tr>`
   })
 }
 
-document.getElementById('form-senioridade').addEventListener('submit', async (e) => {
+listarSenioridades()
+
+formSenioridade.addEventListener('submit', async (e) => {
   e.preventDefault()
 
-  const dados = {
-    nivel: document.getElementById('nivel').value
+  const senioridade = { nome: document.getElementById('nome').value }
+  const idSenioridade = formSenioridade.dataset.idSenioridade
+
+  if (idSenioridade) {
+    await fetch(`${API}/senioridade/${idSenioridade}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(senioridade)
+    })
+  } else {
+    await fetch(`${API}/senioridade`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(senioridade)
+    })
   }
 
-  await fetchAutenticado(`${API}/senioridade`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(dados)
-  })
-
-  document.getElementById('form-senioridade').reset()
-  carregarSenioridade()
+  limparFormulario()
+  listarSenioridades()
 })
 
-async function deletarSenioridade(id) {
-  await fetchAutenticado(`${API}/senioridade/${id}`, {
-    method: 'DELETE'
-  })
-  carregarSenioridade()
+function preencherFormularioEdicao(senioridade) {
+  document.getElementById('nome').value = senioridade.nome
+  formSenioridade.dataset.idSenioridade = senioridade.idsenioridade
+  botaoSubmit.textContent = 'Salvar alteração'
+  botaoSubmit.classList.remove('btn-primary')
+  botaoSubmit.classList.add('btn-success')
 }
 
-carregarSenioridade()
+async function deletarSenioridade(id) {
+  if (!confirm('Tem certeza que deseja excluir esta senioridade?')) return
+  await fetch(`${API}/senioridade/${id}`, { method: 'DELETE' })
+  listarSenioridades()
+}

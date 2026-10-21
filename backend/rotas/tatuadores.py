@@ -10,13 +10,13 @@ class Tatuador(BaseModel):
     cpf: str
     email: Optional[str] = None
     telefone: Optional[str] = None
-    datacontratacao: str
+    datacontratacao: Optional[str] = None
     idsenioridade: int
 
 class EstilosDoTatuador(BaseModel):
     idestilos: List[int]
 
-@router.get("")
+@router.get("/tatuadores")
 def listar_tatuadores():
     conn = conectar()
     cursor = conn.cursor(dictionary=True)
@@ -33,7 +33,7 @@ def listar_tatuadores():
     conn.close()
     return tatuadores
 
-@router.get("/{id}")
+@router.get("/tatuadores/{id}")
 def buscar_tatuador(id: int):
     conn = conectar()
     cursor = conn.cursor(dictionary=True)
@@ -44,7 +44,7 @@ def buscar_tatuador(id: int):
         return {"erro": "Tatuador não encontrado"}
     return tatuador
 
-@router.post("")
+@router.post("/tatuadores")
 def criar_tatuador(tatuador: Tatuador):
     conn = conectar()
     cursor = conn.cursor()
@@ -59,7 +59,7 @@ def criar_tatuador(tatuador: Tatuador):
     conn.close()
     return {"mensagem": "Tatuador cadastrado com sucesso", "idtatuador": novo_id}
 
-@router.put("/{id}")
+@router.put("/tatuadores/{id}")
 def atualizar_tatuador(id: int, tatuador: Tatuador):
     conn = conectar()
     cursor = conn.cursor()
@@ -74,7 +74,7 @@ def atualizar_tatuador(id: int, tatuador: Tatuador):
     conn.close()
     return {"mensagem": "Tatuador atualizado com sucesso"}
 
-@router.delete("/{id}")
+@router.delete("/tatuadores/{id}")
 def deletar_tatuador(id: int):
     conn = conectar()
     cursor = conn.cursor()
@@ -86,9 +86,9 @@ def deletar_tatuador(id: int):
     except Exception as erro:
         conn.rollback()
         conn.close()
-        return {"erro": "Não foi possível excluir este tatuador. Verifique se ele possui agendamentos."}
+        return {"erro": "Não foi possível excluir este tatuador. Verifique se ele possui agendamentos ou estilos cadastrados."}
 
-@router.get("/{id}/estilos")
+@router.get("/tatuadores/{id}/estilos")
 def listar_estilos_do_tatuador(id: int):
     conn = conectar()
     cursor = conn.cursor(dictionary=True)
@@ -102,7 +102,7 @@ def listar_estilos_do_tatuador(id: int):
     conn.close()
     return estilos
 
-@router.put("/{id}/estilos")
+@router.put("/tatuadores/{id}/estilos")
 def atualizar_estilos_do_tatuador(id: int, dados: EstilosDoTatuador):
     conn = conectar()
     cursor = conn.cursor()

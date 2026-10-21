@@ -8,11 +8,12 @@ router = APIRouter()
 class Cliente(BaseModel):
     nome: str
     cpf: str
-    email: Optional[str] = None
     telefone: Optional[str] = None
-    datanascimento: Optional[str] = None
+    datacadastro: Optional[str] = None
+    cidade: Optional[str] = None
+    uf: Optional[str] = None
 
-@router.get("")
+@router.get("/clientes")
 def listar_clientes():
     conn = conectar()
     cursor = conn.cursor(dictionary=True)
@@ -21,7 +22,7 @@ def listar_clientes():
     conn.close()
     return clientes
 
-@router.get("/{id}")
+@router.get("/clientes/{id}")
 def buscar_cliente(id: int):
     conn = conectar()
     cursor = conn.cursor(dictionary=True)
@@ -32,34 +33,36 @@ def buscar_cliente(id: int):
         return {"erro": "Cliente não encontrado"}
     return cliente
 
-@router.post("")
+@router.post("/clientes")
 def criar_cliente(cliente: Cliente):
     conn = conectar()
     cursor = conn.cursor()
     cursor.execute(
-        """INSERT INTO cliente (nome, cpf, email, telefone, datanascimento)
-           VALUES (%s, %s, %s, %s, %s)""",
-        (cliente.nome, cliente.cpf, cliente.email, cliente.telefone, cliente.datanascimento)
+        """INSERT INTO cliente (nome, cpf, telefone, datacadastro, cidade, uf)
+           VALUES (%s, %s, %s, %s, %s, %s)""",
+        (cliente.nome, cliente.cpf, cliente.telefone,
+         cliente.datacadastro, cliente.cidade, cliente.uf)
     )
     conn.commit()
     conn.close()
     return {"mensagem": "Cliente cadastrado com sucesso"}
 
-@router.put("/{id}")
+@router.put("/clientes/{id}")
 def atualizar_cliente(id: int, cliente: Cliente):
     conn = conectar()
     cursor = conn.cursor()
     cursor.execute(
         """UPDATE cliente
-           SET nome=%s, cpf=%s, email=%s, telefone=%s, datanascimento=%s
+           SET nome=%s, cpf=%s, telefone=%s, datacadastro=%s, cidade=%s, uf=%s
            WHERE idcliente=%s""",
-        (cliente.nome, cliente.cpf, cliente.email, cliente.telefone, cliente.datanascimento, id)
+        (cliente.nome, cliente.cpf, cliente.telefone,
+         cliente.datacadastro, cliente.cidade, cliente.uf, id)
     )
     conn.commit()
     conn.close()
     return {"mensagem": "Cliente atualizado com sucesso"}
 
-@router.delete("/{id}")
+@router.delete("/clientes/{id}")
 def deletar_cliente(id: int):
     conn = conectar()
     cursor = conn.cursor()

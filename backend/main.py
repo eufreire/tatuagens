@@ -1,21 +1,27 @@
-from fastapi import FastAPI, Depends
-from seguranca import verificar_token
-from rotas import login, usuarios, clientes, senioridade, estilos, tatuadores, agendamentos
+from fastapi import FastAPI
+from fastapi.staticfiles import StaticFiles
+from fastapi.middleware.cors import CORSMiddleware
+from rotas import clientes, senioridade, tatuadores, agendamentos, estilos
+import os
 
-app = FastAPI(
-    title="API Estúdio de Tatuagem",
-    description="API desenvolvida para gerenciar o estúdio de tatuagem.",
-    version="1.4"
+app = FastAPI()
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_methods=["*"],
+    allow_headers=["*"],
 )
 
-app.include_router(login.router, tags=["Login"])
-app.include_router(usuarios.router, prefix="/usuarios", tags=["Usuários"])
-app.include_router(clientes.router, prefix="/clientes", tags=["Clientes"], dependencies=[Depends(verificar_token)])
-app.include_router(senioridade.router, prefix="/senioridade", tags=["Senioridade"], dependencies=[Depends(verificar_token)])
-app.include_router(estilos.router, prefix="/estilos", tags=["Estilos"], dependencies=[Depends(verificar_token)])
-app.include_router(tatuadores.router, prefix="/tatuadores", tags=["Tatuadores"], dependencies=[Depends(verificar_token)])
-app.include_router(agendamentos.router, prefix="/agendamentos", tags=["Agendamentos"], dependencies=[Depends(verificar_token)])
+os.makedirs("uploads", exist_ok=True)
+app.mount("/uploads", StaticFiles(directory="uploads"), name="uploads")
+
+app.include_router(clientes.router)
+app.include_router(senioridade.router)
+app.include_router(tatuadores.router)
+app.include_router(agendamentos.router)
+app.include_router(estilos.router)
 
 @app.get("/")
-def raiz():
-    return {"mensagem": "API do Estúdio de Tatuagem rodando com sucesso!"}
+def inicio():
+    return {"mensagem": "API do estúdio de tatuagem funcionando!"}

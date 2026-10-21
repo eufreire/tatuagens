@@ -103,7 +103,6 @@ INSERT INTO `estilo` (`idestilo`, `descricao`) VALUES
 -- Estrutura para tabela `senioridade`
 --
 
-DROP TABLE IF EXISTS `senioridade`;
 CREATE TABLE `senioridade` (
   `idsenioridade` int(11) NOT NULL,
   `nome` varchar(50) NOT NULL
